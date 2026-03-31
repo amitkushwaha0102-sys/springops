@@ -93,3 +93,66 @@ resource "kubernetes_service" "student_api" {
     type = "NodePort"
   }
 }
+resource "kubernetes_deployment" "mysql" {
+  metadata {
+    name      = "mysql"
+    namespace = kubernetes_namespace.springops.metadata[0].name
+    labels = {
+      app = "mysql"
+    }
+  }
+
+  spec {
+    replicas = 1
+
+    selector {
+      match_labels = {
+        app = "mysql"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "mysql"
+        }
+      }
+
+      spec {
+        container {
+          name  = "mysql"
+          image = "mysql:8.0"
+          port {
+            container_port = 3306
+          }
+          env {
+            name  = "MYSQL_ROOT_PASSWORD"
+            value = "root123"
+          }
+          env {
+            name  = "MYSQL_DATABASE"
+            value = "studentdb"
+          }
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_service" "mysql" {
+  metadata {
+    name      = "mysql"
+    namespace = kubernetes_namespace.springops.metadata[0].name
+  }
+
+  spec {
+    selector = {
+      app = "mysql"
+    }
+
+    port {
+      port        = 3306
+      target_port = 3306
+    }
+  }
+}
