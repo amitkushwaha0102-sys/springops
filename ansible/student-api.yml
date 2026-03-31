@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-api
+  namespace: springops
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: student-api
+  template:
+    metadata:
+      labels:
+        app: student-api
+    spec:
+      containers:
+      - name: student-api
+        image: amit2700/student-api:latest
+        env:
+        - name: DB_HOST
+          value: "mysql"
+        - name: DB_NAME
+          value: "studentdb"
+        - name: DB_USER
+          value: "root"
+        - name: DB_PASSWORD
+          value: "root123"
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: student-api
+  namespace: springops
+spec:
+  selector:
+    app: student-api
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: NodePort

@@ -1,0 +1,15 @@
+---
+- name: Deploy SpringOps to Kubernetes
+  hosts: local
+  tasks:
+    - name: Deploy MySQL
+      command: kubectl apply -f ~/springgops/student-api/ansible/mysql.yml
+
+    - name: Deploy Student API
+      command: kubectl apply -f ~/springgops/student-api/ansible/student-api.yml
+
+    - name: Wait for MySQL to be ready
+      command: kubectl rollout status deployment/mysql -n springops
+
+    - name: Wait for Student API to be ready
+      command: kubectl rollout status deployment/student-api -n springops
